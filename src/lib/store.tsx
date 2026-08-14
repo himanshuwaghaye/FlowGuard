@@ -36,7 +36,7 @@ export interface Account {
   id: string;
   contact: string;
   role: Role;
-  badgeId?: string;
+  badgeId?: string | undefined;
   verified: boolean;
   createdAt: number;
 }
@@ -53,13 +53,13 @@ export interface SosReport {
   x: number;
   y: number;
   nearestJunction: string;
-  corridorId?: string;
+  corridorId?: string | undefined;
   highway: boolean;
   reporter: string;
-  note?: string;
-  photo?: string;
+  note?: string | undefined;
+  photo?: string | undefined;
   moving: boolean;
-  handledBy?: string;
+  handledBy?: string | undefined;
 }
 
 export interface SignalEdit {
@@ -81,17 +81,17 @@ interface AppState {
   edits: SignalEdit[];
 }
 
-const EMPTY: AppState = { accounts: [], session: null, reports: [], overrides: {}, edits: {} as never };
+const EMPTY: AppState = { accounts: [], session: null, reports: [], overrides: {}, edits: [] };
 const KEY = "flowguard.state.v1";
 
 function load(): AppState {
-  if (typeof window === "undefined") return { ...EMPTY, edits: [] };
+  if (typeof window === "undefined") return { ...EMPTY };
   try {
     const raw = window.localStorage.getItem(KEY);
-    if (!raw) return { ...EMPTY, edits: [] };
-    return { ...EMPTY, edits: [], ...(JSON.parse(raw) as AppState) };
+    if (!raw) return { ...EMPTY };
+    return { ...EMPTY, ...(JSON.parse(raw) as AppState) };
   } catch {
-    return { ...EMPTY, edits: [] };
+    return { ...EMPTY };
   }
 }
 
@@ -111,7 +111,7 @@ interface Ctx {
 const AppCtx = createContext<Ctx | null>(null);
 
 export function AppStateProvider({ children }: { children: ReactNode }) {
-  const [state, setState] = useState<AppState>({ ...EMPTY, edits: [] });
+  const [state, setState] = useState<AppState>({ ...EMPTY });
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
