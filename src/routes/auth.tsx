@@ -79,8 +79,14 @@ function AuthPage() {
   }
 
   function verify(value: string) {
-    if (ttl === 0) return toast.error("Code expired — request a new one.");
-    if (value !== issued) return toast.error("Incorrect code.");
+    if (ttl === 0) {
+      toast.error("Code expired — request a new one.");
+      return;
+    }
+    if (value !== issued) {
+      toast.error("Incorrect code.");
+      return;
+    }
     const existing = accountFor(contact.trim());
     if (existing) {
       signIn(existing.contact, existing.role, existing.badgeId);
