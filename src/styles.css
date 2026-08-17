@@ -10,8 +10,9 @@
  */
 
 @theme inline {
-  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Outfit", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
   --radius-sm: calc(var(--radius) - 2px);
   --radius-md: var(--radius);
   --radius-lg: calc(var(--radius) + 2px);
@@ -52,7 +53,47 @@
 }
 
 :root {
-  --radius: 0.375rem;
+  --radius: 0.5rem;
+  --background: oklch(0.985 0.005 240);
+  --foreground: oklch(0.18 0.02 240);
+  --surface: oklch(0.955 0.006 240);
+  --surface-2: oklch(0.92 0.008 240);
+  --grid: oklch(0.88 0.008 240);
+  --card: oklch(0.97 0.005 240);
+  --card-foreground: oklch(0.18 0.02 240);
+  --popover: oklch(0.98 0.004 240);
+  --popover-foreground: oklch(0.18 0.02 240);
+  --primary: oklch(0.52 0.16 210);
+  --primary-foreground: oklch(0.99 0.002 210);
+  --secondary: oklch(0.93 0.008 240);
+  --secondary-foreground: oklch(0.22 0.02 240);
+  --muted: oklch(0.92 0.006 240);
+  --muted-foreground: oklch(0.46 0.02 240);
+  --accent: oklch(0.91 0.012 240);
+  --accent-foreground: oklch(0.18 0.02 240);
+  --destructive: oklch(0.55 0.2 25);
+  --destructive-foreground: oklch(0.98 0.005 25);
+  --border: oklch(0.87 0.008 240);
+  --input: oklch(0.87 0.008 240);
+  --ring: oklch(0.52 0.16 210);
+  --flow: oklch(0.55 0.16 160);
+  --flow-foreground: oklch(0.99 0.005 160);
+  --peak: oklch(0.68 0.17 65);
+  --peak-foreground: oklch(0.18 0.02 65);
+  --critical: oklch(0.58 0.22 25);
+  --critical-foreground: oklch(0.99 0.005 25);
+  --sidebar: var(--surface);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--primary-foreground);
+  --sidebar-accent: var(--accent);
+  --sidebar-accent-foreground: var(--accent-foreground);
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--ring);
+  color-scheme: light;
+}
+
+.dark {
   --background: oklch(0.19 0.014 250);
   --foreground: oklch(0.95 0.006 250);
   --surface: oklch(0.235 0.014 250);
@@ -89,9 +130,6 @@
   --sidebar-accent-foreground: var(--accent-foreground);
   --sidebar-border: var(--border);
   --sidebar-ring: var(--ring);
-}
-
-.dark {
   color-scheme: dark;
 }
 

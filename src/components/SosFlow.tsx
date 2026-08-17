@@ -12,16 +12,19 @@ import {
   type SosReport,
   type SosType,
 } from "@/lib/store";
-import { CORRIDORS, junctionById } from "@/lib/traffic";
+import { CORRIDORS, gpsToMapPercent, junctionById, mapPercentToGps } from "@/lib/traffic";
 import { cn } from "@/lib/utils";
 
 const CANCEL_WINDOW = 20;
 
-/** Maps a real GPS fix onto the synthetic network's 0-100 map space. */
+/** Maps a real GPS fix onto Nagpur map space. */
 function projectGps(lat: number, lon: number) {
-  const x = ((((lon % 1) + 1) % 1) * 100 + 8) % 92;
-  const y = ((((lat % 1) + 1) % 1) * 100 + 12) % 88;
-  return { x: Math.round(x * 10) / 10, y: Math.round(y * 10) / 10 };
+  // If coordinates are inside or near Nagpur
+  if (lat >= 20.9 && lat <= 21.4 && lon >= 78.8 && lon <= 79.3) {
+    return gpsToMapPercent(lat, lon);
+  }
+  // Default to central Nagpur Sitabuldi
+  return { x: 58.2, y: 44.2 };
 }
 
 export function SosButton({ className }: { className?: string }) {

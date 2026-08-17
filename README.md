@@ -122,7 +122,9 @@ Deliverable
 
 A responsive web app (desktop-first for the planner and police/ambulance dashboards, mobile-friendly for the citizen view — especially the SOS flow, which must work smoothly one-handed on a phone) built on the existing FlowGuard-style structure. Implement the simulation engine, OTP + role-based login, the Emergency SOS pipeline (live location → database → live police/ ambulance dashboard → auto reroute + signal rebalance), and the design direction above throughout — not just on a single page.
 
-Note for the build tool: this depends on real backend capability — a database for accounts/roles/incidents/SOS reports, an OTP delivery service (SMS/email), and live geolocation. If the platform can't wire up real OTP delivery or a live database/backend out of the box, build the full UI/UX flow with mocked-but-realistic data and clearly mark which parts need a real backend connected (e.g. Supabase, which Lovable integrates with natively) to go live.Prompt: Add OTP Login + Role Selection + Emergency SOS
+Note for backend: this depends on backend capability — a database for accounts/roles/incidents/SOS reports, an OTP delivery service (SMS/email), and live geolocation. Connect a backend (e.g. Supabase) to go live.
+
+Prompt: Add OTP Login + Role Selection + Emergency SOS
 
 Add the following features to the existing site (signal-wise-path / FlowGuard). Keep the current visual style, color palette, and layout intact — extend it, don't redesign it.
 
@@ -198,25 +200,18 @@ This needs a real backend: a database for accounts/roles/incidents/SOS reports, 
 
 Match the existing site's colors, typography, and map-first layout — the new login and SOS elements should look like a natural extension of the current design, not a bolted-on feature.
 
-This project was built with [Lovable](https://lovable.dev).
-
-**Live app**: https://flowguardhelps.lovable.app
-
-## Build with Lovable
-
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/1e520991-15ee-4b76-8ce9-4dab13d8399f).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
-
 ## Development
 
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+To run the project locally:
 
 ```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
+npm install
 npm run dev
 ```
+
+To build for production:
+
+```sh
+npm run build
+```
+

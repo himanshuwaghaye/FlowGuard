@@ -3,6 +3,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { Activity, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ROLE_HOME, ROLE_LABEL, useApp } from "@/lib/store";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { cn } from "@/lib/utils";
 
 export function LastUpdated({ className }: { className?: string }) {
@@ -36,12 +37,18 @@ export function Shell({ children, right }: { children: ReactNode; right?: ReactN
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center gap-4 border-b border-border bg-surface/95 px-4 backdrop-blur">
-        <Link to="/" className="flex items-center gap-2">
-          <Activity className="h-5 w-5 text-primary" strokeWidth={2.5} />
-          <span className="text-sm font-semibold tracking-tight">FlowGuard</span>
-          <span className="hidden text-[11px] text-muted-foreground sm:inline">
-            Planning Authority
-          </span>
+        <Link to="/" className="flex items-center gap-2.5 group">
+          <img
+            src="/logo.png"
+            alt="FlowGuard Logo"
+            className="h-8 w-8 rounded-md object-cover shadow-sm ring-1 ring-border/50 transition-transform duration-200 group-hover:scale-105"
+          />
+          <div className="flex flex-col">
+            <span className="text-sm font-bold tracking-tight leading-tight">FlowGuard</span>
+            <span className="hidden sm:inline text-[10px] text-muted-foreground leading-tight font-medium tracking-wide">
+              Traffic Signal Intelligence
+            </span>
+          </div>
         </Link>
         <nav className="hidden items-center gap-1 md:flex">
           {NAV.map((n) => (
@@ -57,8 +64,9 @@ export function Shell({ children, right }: { children: ReactNode; right?: ReactN
             </Link>
           ))}
         </nav>
-        <div className="ml-auto flex items-center gap-3">
+        <div className="ml-auto flex items-center gap-2 sm:gap-3">
           {right}
+          <ThemeToggle />
           <LastUpdated className="hidden lg:flex" />
           {user ? (
             <div className="flex items-center gap-2">

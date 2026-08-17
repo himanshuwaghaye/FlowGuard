@@ -3,7 +3,7 @@
  *
  * BACKEND NOTE: everything here is persisted to localStorage and broadcast
  * across tabs via the `storage` event, which simulates realtime. Connect
- * Lovable Cloud to swap this for real auth + OTP delivery + a live database.
+ * a live backend / Supabase to swap this for real auth + OTP delivery + a live database.
  */
 import {
   createContext,
@@ -65,12 +65,15 @@ export interface SosReport {
 export interface SignalEdit {
   id: string;
   junctionId: string;
+  junctionName?: string;
+  ward?: string;
   from: number;
   to: number;
   by: string;
   role: Role;
   at: number;
   reason: string;
+  directions?: { north?: number; south?: number; east?: number; west?: number };
 }
 
 interface AppState {
@@ -99,16 +102,27 @@ interface Ctx {
   ready: boolean;
   state: AppState;
   user: Account | null;
+  canEdit: boolean;
   signIn: (contact: string, role: Role, badgeId?: string) => Account;
   signOut: () => void;
   accountFor: (contact: string) => Account | undefined;
   createSos: (r: Omit<SosReport, "id" | "createdAt" | "updatedAt" | "status">) => SosReport;
   updateSos: (id: string, patch: Partial<SosReport>) => void;
-  setOverride: (junctionId: string, value: number, reason: string) => void;
+  setOverride: (
+    junctionId: string,
+    value: number,
+    reason: string,
+    directions?: { north?: number; south?: number; east?: number; west?: number },
+  ) => void;
   clearOverride: (junctionId: string) => void;
+  resetAllOverrides: () => void;
 }
 
 const AppCtx = createContext<Ctx | null>(null);
+
+export function canEditSignals(user: Account | null | undefined): boolean {
+  return user?.role === "police" || user?.role === "authority";
+}
 
 export function AppStateProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<AppState>({ ...EMPTY });
@@ -138,10 +152,13 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
     [state.accounts, state.session],
   );
 
+  const canEdit = useMemo(() => canEditSignals(user), [user]);
+
   const value: Ctx = {
     ready,
     state,
     user,
+    canEdit,
     accountFor: (contact) => state.accounts.find((a) => a.contact === contact),
     signIn: (contact, role, badgeId) => {
       const existing = state.accounts.find((a) => a.contact === contact);
@@ -178,17 +195,21 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
           r.id === id ? { ...r, ...patch, updatedAt: Date.now() } : r,
         ),
       }),
-    setOverride: (junctionId, value, reason) => {
-      const prev = state.overrides[junctionId] ?? junctionById(junctionId)?.baseGreen ?? 40;
+    setOverride: (junctionId, value, reason, directions) => {
+      const junc = junctionById(junctionId);
+      const prev = state.overrides[junctionId] ?? junc?.baseGreen ?? 40;
       const edit: SignalEdit = {
         id: `e_${Date.now().toString(36)}`,
         junctionId,
+        junctionName: junc?.name,
+        ward: junc?.ward,
         from: prev,
         to: value,
-        by: user?.contact ?? "unknown",
+        by: user?.contact ?? "Duty Officer",
         role: user?.role ?? "authority",
         at: Date.now(),
-        reason,
+        reason: reason || "Manual traffic regulation",
+        directions,
       };
       commit({
         ...state,
@@ -200,6 +221,9 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
       const next = { ...state.overrides };
       delete next[junctionId];
       commit({ ...state, overrides: next });
+    },
+    resetAllOverrides: () => {
+      commit({ ...state, overrides: {} });
     },
   };
 

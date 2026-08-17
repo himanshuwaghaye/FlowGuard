@@ -9,6 +9,7 @@ import { MapLegend, TrafficMap } from "@/components/TrafficMap";
 import { JunctionEditor } from "@/components/JunctionEditor";
 import {
   JUNCTIONS,
+  ZONE_LABEL,
   defaultSimInput,
   fastestRoute,
   junctionById,
@@ -20,16 +21,16 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/responder")({
   head: () => ({
     meta: [
-      { title: "Responder Console — Live SOS Dispatch" },
+      { title: "Responder Console — Nagpur Emergency Dispatch" },
       {
         name: "description",
         content:
-          "Police and ambulance console: live SOS pins, congestion-aware fastest routes, acknowledge and resolve incidents, and override junction signals on scene.",
+          "Police and emergency services console for Nagpur: real-time SOS queue, green corridor routing across all 52 signal nodes, and instant junction override controls.",
       },
-      { property: "og:title", content: "Responder Console — Live SOS Dispatch" },
+      { property: "og:title", content: "Responder Console — Nagpur Emergency Dispatch" },
       {
         property: "og:description",
-        content: "Live SOS queue, fastest congestion-aware routing and on-scene signal control.",
+        content: "Live SOS queue, fastest congestion-aware routing and on-scene signal control across Nagpur.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -39,10 +40,10 @@ export const Route = createFileRoute("/responder")({
 });
 
 function ResponderView() {
-  const { user, state, updateSos, ready } = useApp();
+  const { user, state, updateSos, ready, canEdit } = useApp();
   const navigate = useNavigate();
   const [now, setNow] = useState(() => Date.now());
-  const [base, setBase] = useState("J5");
+  const [base, setBase] = useState("J1"); // Zero Mile HQ
   const [focus, setFocus] = useState<string | null>(null);
   const [junction, setJunction] = useState<string | null>(null);
   const [seen, setSeen] = useState<string[]>([]);
@@ -68,25 +69,25 @@ function ResponderView() {
     if (fresh.length) {
       setSeen((s) => [...s, ...fresh.map((f) => f.id)]);
       for (const f of fresh) {
-        toast.error(`New SOS — ${f.type}`, {
-          description: `${junctionById(f.nearestJunction)?.name} · reported by ${f.reporter}`,
+        toast.error(`Emergency SOS: ${f.type.toUpperCase()}`, {
+          id: f.id,
+          description: `Location: ${junctionById(f.nearestJunction)?.name ?? f.nearestJunction}. Emergency dispatched.`,
         });
       }
     }
-  }, [active.map((a) => a.id).join(","), seen]);
+  }, [active, seen]);
+
+  const target = focus ? active.find((r) => r.id === focus) ?? active[0] : active[0];
+  const route = target ? fastestRoute(base, target.nearestJunction, result) : null;
+  const isResponder = user?.role === "ambulance" || user?.role === "police";
 
   const ranked = [...active].sort((a, b) => {
     const da = dist(base, a);
     const db = dist(base, b);
-    return a.createdAt === b.createdAt ? da - db : b.createdAt - a.createdAt;
+    return da - db;
   });
 
-  const target = ranked.find((r) => r.id === focus) ?? ranked[0] ?? null;
-  const route = target ? fastestRoute(base, target.nearestJunction, result) : null;
-
   if (!user) return null;
-
-  const isResponder = user.role === "police" || user.role === "ambulance";
 
   return (
     <Shell
@@ -105,13 +106,13 @@ function ResponderView() {
               ) : (
                 <ShieldAlert className="h-4 w-4 text-critical" />
               )}
-              Active SOS queue
+              Active SOS Queue
             </h1>
             <span className="num text-xs text-muted-foreground">{active.length}</span>
           </div>
 
           <div className="panel p-2.5">
-            <div className="label-xs">Your unit station</div>
+            <div className="label-xs">Unit Dispatch Station (Base)</div>
             <select
               value={base}
               onChange={(e) => setBase(e.target.value)}
@@ -119,7 +120,7 @@ function ResponderView() {
             >
               {JUNCTIONS.map((j) => (
                 <option key={j.id} value={j.id}>
-                  {j.name}
+                  {j.name} ({j.zone.toUpperCase()})
                 </option>
               ))}
             </select>
@@ -127,7 +128,7 @@ function ResponderView() {
 
           {ranked.length === 0 && (
             <p className="text-xs text-muted-foreground">
-              No active SOS. New citizen reports appear here instantly with a live pin and alert.
+              No active SOS alerts in Nagpur. New citizen reports appear here instantly with live dispatch routing.
             </p>
           )}
 
